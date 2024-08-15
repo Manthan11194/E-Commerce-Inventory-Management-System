@@ -2,10 +2,13 @@ package com.example.assignment.services;
 
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.assignment.controllers.ProductController;
 import com.example.assignment.dtos.CategoryDto;
 import com.example.assignment.dtos.ProductDto;
 import com.example.assignment.dtos.ProductRequestDto;
@@ -19,7 +22,7 @@ public class ProductServiceImpl implements ProductService{
 	
 	private ProductRepository productRepo;
 	private CategoryRepository categoryRepo;
-	
+	private static final Logger logger = LogManager.getLogger(ProductServiceImpl.class);
 	ProductServiceImpl(ProductRepository productRepo,CategoryRepository categoryRepo){
 		this.productRepo = productRepo;
 		this.categoryRepo = categoryRepo;
@@ -27,6 +30,7 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public String createProduct(ProductRequestDto productDto) {
+		logger.info("Create a product.");
 		Products product = new Products();
 		product.setName(productDto.getName());
 		product.setDescription(productDto.getDescription());
@@ -37,13 +41,14 @@ public class ProductServiceImpl implements ProductService{
 			product.setCategory(categoryOptional.get());
 		}
 		productRepo.save(product);
+		logger.info("Product Created Successfully.");
 		return "Product added successfully.";
 	}
 
 	@Override
 	public Page<Products> getAllProducts(Pageable pageable) {
 		Page<Products> products = productRepo.findAll(pageable);
-
+		logger.info("Feching Products.");
 		return products;
 	}
 
@@ -54,7 +59,7 @@ public class ProductServiceImpl implements ProductService{
 		if(productOptional.isPresent()) {
 			productDto = convetModelToProductDto(productOptional.get());
 		}
-		
+		logger.info("Feching Product By ID.");
 		return productDto;
 		
 	}
@@ -83,6 +88,7 @@ public class ProductServiceImpl implements ProductService{
 			product.setDescription(productDto.getDescription());
 			product.setPrice(productDto.getPrice());
 			productRepo.save(product);
+			logger.info("Update Product.");
 			return "Product updated successfully.";
 		}
 		
@@ -96,6 +102,7 @@ public class ProductServiceImpl implements ProductService{
 		Optional<Products> productOptional = productRepo.findById(id);
 		if(productOptional.isPresent()) {
 			productRepo.deleteById(id);
+			logger.info("Delete Product.");
 			return "Product with id :"+id+ " is deleted.";
 		}
 		

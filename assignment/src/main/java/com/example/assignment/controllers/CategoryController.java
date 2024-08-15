@@ -24,85 +24,99 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.assignment.dtos.CategoryDto;
 import com.example.assignment.models.Category;
 import com.example.assignment.services.CategoryService;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api")
-@Slf4j
+@RequestMapping("/api/categories")
 public class CategoryController {
 	
+    private static final Logger logger = LogManager.getLogger(CategoryController.class);
+	
 	//@Autowired
+	//Constructor injection.
 	private CategoryService categoryService;
 	CategoryController(CategoryService categoryService){
 		this.categoryService = categoryService;
 	}
 	
 	//Create a category
-	@PostMapping("/categories")
+	@PostMapping
 	public ResponseEntity<String> createCategory(@RequestBody CategoryDto category) {
 		String responseBody = new String();
         try {
-        	
+        	logger.info("Create a category.");
             responseBody = categoryService.createCategory(category);
             return new ResponseEntity(responseBody, HttpStatus.OK);
         } catch (Exception e) {
+        	logger.error("Error occured!",e.getMessage());
         }
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 	//Get all categories
-	@GetMapping("/categories")
+	@GetMapping
 	public ResponseEntity<Page<Category>> getAllCategories(
 			@RequestParam(defaultValue = "0") int page ,
 			@RequestParam(defaultValue = "10") int size) {
 		
         try {
+        	logger.info("Get all categories.");
             Pageable pageable = PageRequest.of(page,size);
 
             Page<Category> categories = categoryService.getAllCategories(pageable);
             return new ResponseEntity(categories, HttpStatus.OK);
             
         } catch (Exception e) {
+        	logger.error("Error occured!",e.getMessage());
+
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 	
 	//Get Category by id.
-	@GetMapping("/categories/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Integer id) {
 		CategoryDto categoryDto = new CategoryDto();
         try {
+        	logger.info("Get category by id: ",id);
         	categoryDto = categoryService.getCategoryById(id);
             return new ResponseEntity(categoryDto, HttpStatus.OK);
             
         } catch (Exception e) {
+        	logger.error("Error occured!",e.getMessage());
+
         }
         return new ResponseEntity<>(categoryDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 	
 	//Update a category.
-	@PutMapping("/categories/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<String> updateCategory(@PathVariable Integer id,@RequestBody CategoryDto category) {
 		String responseBody = new String();
         try {
-        	
+        	logger.info("Updating category.");
             responseBody = categoryService.updateCategory(id,category);
             return new ResponseEntity(responseBody, HttpStatus.OK);
         } catch (Exception e) {
+        	logger.error("Error occured!",e.getMessage());
+
         }
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 	
 	//Delete a category
-	@DeleteMapping("/categories/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteCategory(@PathVariable Integer id) {
 		String responseBody = new String();
         try {
-        	
+        	logger.info("Deleting a categpry.");
             responseBody = categoryService.deleteCategory(id);
             return new ResponseEntity(responseBody, HttpStatus.OK);
         } catch (Exception e) {
+        	logger.error("Error occured!",e.getMessage());
+
         }
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
